@@ -54,6 +54,10 @@ public class AuctionServlet extends HttpServlet {
 						session.setAttribute("user", request.getParameter("account_id").trim());
 						response.sendRedirect("Admindashboard.jsp");
 					}
+						else {
+							session.setAttribute("user", request.getParameter("account_id").trim());
+							response.sendRedirect("dashboard.jsp");
+						}
 					}
 					else { //regular user
 					session.setAttribute("user", request.getParameter("account_id").trim());
@@ -70,6 +74,52 @@ public class AuctionServlet extends HttpServlet {
 			}
 		}
 			
+		else if (request.getParameter("Slogin_form") != null){
+			try {
+				// LOG IN
+				session = request.getSession();
+				// Checks if the given account id and password exists in the user account table
+				if (db.searchAccountExists(request.getParameter("Saccount_id").trim())) {
+					System.out.println("Account matches");
+					
+					
+					session.setAttribute("suser", request.getParameter("Saccount_id").trim());
+					response.sendRedirect("EndUserSalesReport2.jsp");
+					
+					//response.sendRedirect("dashboard.jsp");
+				} else {
+					response.sendRedirect("wrong.jsp");
+				}
+				
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				response.sendRedirect("wrong.jsp");
+			}
+		}
+		else if (request.getParameter("Ilogin_form") != null){
+			try {
+				// LOG IN
+				session = request.getSession();
+				// Checks if the given account id and password exists in the user account table
+				if (db.searchItem(request.getParameter("Sname").trim())) {
+					//System.out.println("item matches");
+					
+					
+					session.setAttribute("Item", request.getParameter("Sname").trim());
+					response.sendRedirect("PerItemSalesReport2.jsp");
+					
+					//response.sendRedirect("dashboard.jsp");
+				} else {
+					response.sendRedirect("wrong.jsp");
+				}
+				
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				response.sendRedirect("wrong.jsp");
+			}
+		}
+		
+		
 		// Gets cid from dashboard and puts it in session object
 			else if(request.getParameter("bid_form") != null) {
 				try 
@@ -181,7 +231,7 @@ public class AuctionServlet extends HttpServlet {
 		if (request.getParameter("listing_form") != null) {
 			try {
 				// If listing creation is successful then user is sent to the dash board else they are sent to an error page
-				if (db.createListing(request.getParameter("brand").trim(), request.getParameter("item_type"), request.getParameter("clothing_size"), request.getParameter("shoe_size"), String.valueOf(session.getAttribute("user")),
+				if (db.createListing(request.getParameter("brand").trim(), request.getParameter("name").trim(), request.getParameter("item_type"), request.getParameter("clothing_size"), request.getParameter("shoe_size"), String.valueOf(session.getAttribute("user")),
 						request.getParameter("bid_increment").trim(), request.getParameter("start_price").trim(),
 		        		request.getParameter("end_date").trim(), request.getParameter("end_time").trim(), request.getParameter("min_price").trim())) {
 		        	response.sendRedirect("dashboard.jsp");

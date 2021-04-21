@@ -14,8 +14,10 @@
 	
 	<body>
 	<body style="background-color:#1F1F1F;">
-	<form method="get" action="createCR.jsp"><input type="submit" value="Create Customer Representive Account"></form>
-	<form method="get" action="SalesReport.jsp"><input type="submit" value="Generate Sales Reports"></form>
+	<form method="get" action="TopBuyers.jsp"><input type="submit" value="Best Buyers"></form>
+	<form method="get" action="TopItems.jsp"><input type="submit" value="Best Selling Items"></form>
+	<form method="get" action="EndUserSalesReport.jsp"><input type="submit" value="End User Sales Report"></form>
+	<form method="get" action="PerItemSalesReport.jsp"><input type="submit" value="Per Item Sales Report"></form>
 	<% ApplicationDB db=new ApplicationDB(); String total = db.totalEarnings(); String totalTops = db.topsEarnings();String totalShoes = db.shoesEarnings(); String totalBottoms = db.bottomsEarnings();%>
 	<p style="font-family:georgia,garamond,serif;font-size:24px;font-style:bold;color:white;">
      Total Earnings: $<%=total%>
@@ -28,8 +30,6 @@
      Bottoms: $<%=totalBottoms%>
      <br> 
      Tops:    $<%=totalTops%>
-     
-     
-     TOP BUYERS:
+
      
     </p>

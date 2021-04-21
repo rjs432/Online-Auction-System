@@ -36,6 +36,7 @@
                         <th>Category</th>
                         <th>Size</th>
                         <th>Brand</th>
+                        <th>Name</th>
                         <th>Current Price</th>
                         <th>Start Time</th>
                         <th>End Time</th>

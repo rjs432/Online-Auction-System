@@ -31,6 +31,10 @@
          			Brand:</p> </td> <td><input type="text" name="brand"></td>
 				</tr>
 				<tr>
+				<td> <p style="font-family:georgia,garamond,serif;font-size:16px;color:white;">
+         			Item Name:</p> </td> <td><input type="text" name="name"></td>
+         		</tr>
+				<tr>
 					<td><p style="font-family:georgia,garamond,serif;font-size:16px;color:white;">
          			Item Type:</p></td><td>
          			
