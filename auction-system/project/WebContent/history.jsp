@@ -17,6 +17,7 @@
 </head>
 <%
 	ApplicationDB db=new ApplicationDB(); ArrayList<String[]> bidList = new ArrayList<String[]>();
+	db.loopListing();
 	String cid = String.valueOf(session.getAttribute("cid"));
     bidList = db.getHistory(cid);
 

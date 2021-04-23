@@ -17,6 +17,7 @@
 </head>
 <%
 	ApplicationDB db=new ApplicationDB();
+	db.loopListing();
 	ArrayList<String[]> itemList = new ArrayList<String[]>();
 	itemList = db.topItems();	
         %>
