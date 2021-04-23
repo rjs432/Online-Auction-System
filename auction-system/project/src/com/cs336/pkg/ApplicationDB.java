@@ -431,6 +431,60 @@ public class ApplicationDB {
 		}
 	}
 	
+	// Creates watch alert for future item
+	public boolean createWatchAlert(String name, String user) {
+		try {
+
+			if (name.trim().equals("") || user.equals("")) {
+				System.out.println("Is something empty? Alert could not be set");
+				return false;
+			}
+
+			// Checks if a valid account id is submitted when creating watch alert
+			if (!accountIsValid(user))
+			{
+				System.out.println("Is the account valid?");
+				return false;
+			}
+
+			// Get the database connection
+			Connection con = this.getConnection();
+			
+			String alertExists = "";
+
+			// Create a SQL statement
+			Statement stmt = con.createStatement();
+							
+			String sqlCheck = String.format("select info from watching_alert where account_id = '%s'", user);
+
+			// Run the query against the DB and retrieves results
+			ResultSet rs = stmt.executeQuery(sqlCheck);
+
+			while (rs.next()) {
+				alertExists = rs.getString("info");
+			}
+			rs.close();
+			
+			if (!alertExists.equals("")) {
+				String updateSQL = String.format("UPDATE watching_alert set info = '%s' where account_id = '%s'", name, user);
+				stmt.executeUpdate(updateSQL);
+				con.close();
+				return true;
+			}
+
+			// Forms sql insert watch alert
+			String sql = String.format("insert into watching_alert (info, account_id) values ('%s', '%s')", name, user);
+			stmt.executeUpdate(sql);
+
+			con.close();
+			return true;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+	
 	//Allows the user to bid on an item
 		public boolean createBid(String price, String upperLimit, String accountID, String CID)
 		{
@@ -751,7 +805,7 @@ public class ApplicationDB {
 			// Forms sql to get all bids
 			ArrayList<String[]> bidList = new ArrayList<String[]>();
 
-			String sql = String.format("select * from bids where cid = '%s' order by price ASC", cid);
+			String sql = String.format("select * from bids where cid = '%s' and upper_limit = 0 and bidincrement = 0 order by price ASC", cid);
 
 			// Run the query against the DB and retrieves results
 			ResultSet rs = stmt.executeQuery(sql);
@@ -818,7 +872,7 @@ public class ApplicationDB {
 			// Forms sql to get all auctions
 			ArrayList<String[]> auctionList = new ArrayList<String[]>();
 
-			String sql = String.format("select *, count(b.account_id) as p from bids b, clothing c where b.account_id = '%s' and c.cid = b.cid group by b.cid", user);
+			String sql = String.format("select *, count(b.account_id) as p from bids b, clothing c where b.account_id = '%s' and c.cid = b.cid  and upper_limit = 0 and bidincrement = 0 group by b.cid", user);
 
 			// Run the query against the DB and retrieves results
 			ResultSet rs = stmt.executeQuery(sql);
@@ -834,6 +888,52 @@ public class ApplicationDB {
 
 			}
 			rs.close();
+			
+			// Close the connection
+			con.close();
+			return auctionList;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
+	
+	public ArrayList<String[]> getPersonalSellHistory(String user) {
+		try {
+			// Get the database connection
+			Connection con = this.getConnection();
+
+			// Create a SQL statement
+			Statement stmt = con.createStatement();
+
+			// Forms sql to get all auctions
+			ArrayList<String[]> auctionList = new ArrayList<String[]>();
+
+			// Forms sql to get all listing data
+			String[] cats = { "shoes", "tops", "bottoms" };
+
+			for (int i = 0; i < cats.length; i++) {
+
+				String sql = String.format(
+						"select c.cid, cat.category, cat.size, c.brand,c.name, c.cur_price, c.bid_increment, s.start_date, s.end_date,"
+								+ " a.account_id from account a, sells s, clothing c, %s cat where s.cid = cat.cid and cat.cid = c.cid"
+								+ " and a.account_id = s.account_id and a.account_id = '%s'", cats[i], user);
+						
+
+				// Run the query against the DB and retrieves results
+				ResultSet rs = stmt.executeQuery(sql);
+
+				// Iterates through the returned listings
+				while (rs.next()) {
+					String[] items = { rs.getString("cid"), rs.getString("category"), rs.getString("size"),
+							rs.getString("brand"), rs.getString("name"),rs.getString("cur_price"), rs.getString("bid_increment"), rs.getString("start_date"),
+							rs.getString("end_date") };
+
+					auctionList.add(items);
+				}
+				rs.close();
+			}
 			
 			// Close the connection
 			con.close();
@@ -939,6 +1039,65 @@ public class ApplicationDB {
 				
 				alerts[index] = "upper limit";
 				alertList.add(alerts);
+			}
+			
+			// Close connection
+			con.close();
+			return alertList;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
+	
+	public ArrayList<String[]> getWatchAlerts(String user) {
+		try {
+
+			// Get the database connection
+			Connection con = this.getConnection();
+
+			// Create a SQL statement
+			Statement stmt = con.createStatement();
+						
+			ArrayList<String> infoList = new ArrayList<String>();
+			ArrayList<String[]> alertList = new ArrayList<String[]>();
+			
+			 String alertSQL = String.format("select info from watching_alert where account_id = '%s'", user);
+
+			// Run the query against the DB and retrieves results
+			ResultSet rs = stmt.executeQuery(alertSQL);
+
+			// Iterates through the returned listings
+			while (rs.next()) {
+				infoList.add(String.valueOf(rs.getString("info")));
+			}
+			rs.close();
+			
+			// Loops through the CIDs that the logged in user has participated in to get any potential alert messages
+			for (int i = 0; i < infoList.size(); i++) {
+				
+				String[] alert = new String[2];
+				alert[0] = infoList.get(i);
+				
+				// Gets the name of all items to see if the watched item has been listed
+				String nameSQL = String.format("select name from clothing where name = '%s'", infoList.get(i));
+				
+				ResultSet rs2 = stmt.executeQuery(nameSQL);
+				
+				String listed = "";
+
+				while (rs2.next()) {
+					listed = rs2.getString("name");
+				}
+				rs2.close();
+				
+				if (listed.equals("")) {
+					alert[1] = "No";
+				} else {
+					alert[1] = "Yes";
+				}
+				alertList.add(alert);
 			}
 			
 			// Close connection

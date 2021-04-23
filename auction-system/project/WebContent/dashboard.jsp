@@ -26,7 +26,10 @@
             <form method="get" action="main.jsp"><input type="submit" value="Log Out"></form>
             <form method="get" action="createListing.jsp"><input type="submit" value="Create A Listing"></form>
             <form method="get" action="alert.jsp"><input type="submit" value="Go To Alerts"></form>
-            <form method="get" action="personal_history.jsp"><input type="submit" value="View Auction History"></form>
+            <form method="get" action="personal_history.jsp"><input type="submit" value="My Bid History"></form>
+            <form method="get" action="personal_sell_history.jsp"><input type="submit" value="My Selling History"></form>
+            <form method="get" action="create_watching_alert.jsp"><input type="submit" value="Create Watch Alert for Item"></form>
+            <form method="get" action="my_watching_alerts.jsp"><input type="submit" value="View My Watch Alerts"></form>
 
             <table id="table_id" class="display">
                 <thead>
