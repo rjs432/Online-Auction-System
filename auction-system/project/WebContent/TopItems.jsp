@@ -32,6 +32,8 @@
                 <thead>
                     <tr>
                         <th>Item</th>
+                        <th>Brand</th>
+                        <th>Category</th>
                         <th># of sales</th>
 
                     </tr>
